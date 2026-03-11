@@ -1,5 +1,7 @@
 import json
 
+from evaluation.metrics import compute_metrics
+
 
 def normalize(label):
 
@@ -9,8 +11,8 @@ def normalize(label):
         "supported": "supported",
         "refuted": "refuted",
         "not enough evidence": "not enough evidence",
-        "conflicting": "conflicting",
-        "conflicting evidence/cherrypicking": "conflicting"
+        "conflicting evidence/cherrypicking": "conflicting",
+        "conflicting": "conflicting"
     }
 
     return mapping.get(label, label)
@@ -25,40 +27,50 @@ def evaluate(predictions_path, dataset_path):
         dataset = json.load(f)
 
 
-    gold_labels = {
+    gold = {
         i: normalize(item["label"])
         for i, item in enumerate(dataset)
     }
 
 
-    correct = 0
-    total = 0
+    y_true = []
+    y_pred = []
 
 
     for pred in predictions:
 
         claim_id = pred["id"]
 
-        predicted = normalize(pred["predicted_label"])
-
-        gold = gold_labels.get(claim_id)
-
-
-        if gold is None:
+        if claim_id not in gold:
             continue
 
-
-        total += 1
-
-        if predicted == gold:
-            correct += 1
+        y_true.append(gold[claim_id])
+        y_pred.append(normalize(pred["predicted_label"]))
 
 
-    accuracy = correct / total if total else 0
+    results = compute_metrics(y_true, y_pred)
 
 
     print("\n===== Evaluation =====\n")
 
-    print("Total claims:", total)
-    print("Correct:", correct)
-    print("Accuracy:", round(accuracy, 3))
+    print("Accuracy:", round(results["accuracy"], 3))
+
+    print("\nPer-class metrics:\n")
+
+
+    for label in results["precision"]:
+
+        p = results["precision"][label]
+        r = results["recall"][label]
+        f = results["f1"][label]
+
+        print(label)
+
+        print("  Precision:", round(p, 3))
+        print("  Recall:   ", round(r, 3))
+        print("  F1:       ", round(f, 3))
+
+        print()
+
+
+    print("Macro F1:", round(results["macro_f1"], 3))
