@@ -9,6 +9,7 @@ from modules.segmentation.passage_extractor import PassageExtractor
 from modules.retrieval.bm25_retriever import BM25Retriever
 from modules.verdict.rule_verdict import RuleVerdict
 from modules.stance.llm_stance_detector import LLMStanceDetector
+from modules.reranking.cross_encoder_reranker import CrossEncoderReranker
 from modules.qa.qa_generator import QAGenerator
 from modules.search.web_search import WebSearch
 from modules.justification.justification_generator import JustificationGenerator
@@ -21,29 +22,18 @@ load_dotenv()
 searcher = WebSearch(api_key=os.getenv("BRAVE_API_KEY"))
 
 llm = OllamaLLM()
-stance_detector = LLMStanceDetector(llm)
-qa_generator = QAGenerator(llm)
-justification_generator = JustificationGenerator(llm)
 
 pipeline = AveritecPipeline(
-
     question_generator=QuestionGenerator(llm),
-
     searcher=searcher,
-
     parser=DocumentParser(),
-
     segmenter=PassageExtractor(),
-
     retriever=BM25Retriever(),
-
-    qa_generator=qa_generator,
-
-    stance_detector=stance_detector,
-
+    qa_generator=QAGenerator(llm),
+    stance_detector=LLMStanceDetector(llm),
     verdict_predictor=RuleVerdict(),
-
-    justification_generator=justification_generator
+    justification_generator=JustificationGenerator(llm),
+    reranker=CrossEncoderReranker()
 )
 
 context = ClaimContext(
