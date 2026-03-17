@@ -7,20 +7,20 @@ class LLMStanceDetector:
     def classify(self, claim, evidence):
 
         prompt = f"""
-            You are a fact-checking assistant.
+        You are a fact-checking assistant.
 
-            Claim:
-            {claim}
+        Claim:
+        {claim}
 
-            Evidence:
-            {evidence}
+        Evidence:
+        {evidence}
 
-            Does the evidence SUPPORT, REFUTE, or is it IRRELEVANT to the claim?
+        Does the evidence SUPPORT, REFUTE, or is it IRRELEVANT to the claim?
 
-            Respond with exactly one word:
-            SUPPORT
-            REFUTE
-            IRRELEVANT
+        Respond with exactly one word:
+        SUPPORT
+        REFUTE
+        IRRELEVANT
         """
 
         response = self.llm.generate(prompt).strip().upper()
@@ -34,13 +34,10 @@ class LLMStanceDetector:
         return "IRRELEVANT"
 
     def run(self, context):
-
         stances = []
 
         for evidence in context.evidence:
-
             stance = self.classify(context.claim, evidence)
-
             stances.append((evidence, stance))
 
         context.stances = stances

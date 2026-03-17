@@ -7,18 +7,18 @@ class QAGenerator:
     def generate_question(self, claim, evidence):
 
         prompt = f"""
-You are helping verify a claim.
+        You are helping verify a claim.
 
-Claim:
-{claim}
+        Claim:
+        {claim}
 
-Evidence:
-{evidence}
+        Evidence:
+        {evidence}
 
-Generate ONE question that this evidence answers.
+        Generate ONE question that this evidence answers.
 
-Return ONLY the question.
-"""
+        Return ONLY the question.
+        """
 
         question = self.llm.generate(prompt).strip()
 

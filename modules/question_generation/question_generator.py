@@ -7,12 +7,12 @@ class QuestionGenerator:
     def run(self, context):
 
         prompt = f"""
-Generate exactly 3 short verification questions for the claim.
+        Generate exactly 3 short verification questions for the claim.
 
-Return ONLY the questions, one per line.
+        Return ONLY the questions, one per line.
 
-Claim: {context.claim}
-"""
+        Claim: {context.claim}
+        """
 
         output = self.llm.generate(prompt)
 

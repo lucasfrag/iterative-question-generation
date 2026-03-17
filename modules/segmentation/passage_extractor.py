@@ -7,15 +7,11 @@ class PassageExtractor:
 
 
     def chunk_text(self, text):
-
         tokens = text.split()
-
         passages = []
-
         step = self.chunk_size - self.overlap
 
         for i in range(0, len(tokens), step):
-
             chunk = tokens[i:i + self.chunk_size]
 
             if len(chunk) < 30:
@@ -27,13 +23,10 @@ class PassageExtractor:
 
 
     def run(self, context):
-
         passages = []
 
         for doc in context.documents:
-
             chunks = self.chunk_text(doc)
-
             passages.extend(chunks)
 
         context.passages = passages
