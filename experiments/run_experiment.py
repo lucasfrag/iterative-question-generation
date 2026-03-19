@@ -90,7 +90,13 @@ def run():
                 for j, step in enumerate(steps):
                     print_step_debug(step, j)
 
-                print(f"\n   ✅ FINAL VERDICT: {result.verdict}")
+                gt = item.get("label")
+
+                correct = (str(result.verdict).lower() == str(gt).lower())
+                status = "✅ CORRECT" if correct else "❌ WRONG"
+                print(f"\n   {status}")
+                print(f"   PRED: {result.verdict}")
+                print(f"   GT  : {gt}")
 
             writer.add(item, result)
             ckpt.mark_done(claim_id)
