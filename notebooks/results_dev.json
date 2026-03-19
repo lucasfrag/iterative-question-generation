@@ -1,0 +1,75 @@
+[
+  {
+    "claim": "In a letter to Steve Jobs, Sean Connery refused to appear in an apple commercial.",
+    "prediction": "not enough evidence",
+    "gold_label": "Refuted",
+    "pipeline": {
+      "questions": [
+        "1. Is there any credible source (e.g., news article, book, document) that confirms Sean Connery wrote a letter to Steve Jobs?",
+        "2. What is the exact date (month/year) when Sean Connery allegedly wrote the letter to Steve Jobs? (Considering the claim date of 31-10-2020)",
+        "3. Is there any evidence that Apple was planning to feature Sean Connery in an advertisement around the time the letter was allegedly written?",
+        "4. Can you provide a quote or a direct citation from the letter, if it exists, where Sean Connery refuses to appear in an Apple commercial?",
+        "5. Were there any public statements or interviews given by Steve Jobs or his team about receiving a letter from Sean Connery regarding an advertisement?"
+      ],
+      "evidence": [
+        {
+          "text": "'I am f****** James Bond': Sean Connery letter to Steve Jobs rejecting offer to appear in Apple ad revealed to be fake Thousands of James Bond fans were today taken in by a spoof letter from Sean Conney to Apple boss Steve Jobs in which the film star launches a rant at the computer chief. The faked A4 letter on 007 paper was published online claiming to have been a response from Connery to a request to feature in an advert for Apple. It purportedly shows Connery aggressively declining the offer and telling Jobs 'You are a computer salesman -",
+          "bm25_score": 57.37180952076094,
+          "rerank_score": 9.3362455368042
+        },
+        {
+          "text": "No, Sean Connery Never Wrote a Rude letter to Apple's Steve Jobs Sir Sean Connery never sent a typewritten letter to late Apple Co-founder Steve Jobs in 1998 refusing to be in an Apple ad, and a fake such letter made the rounds on social media after his death. Sir Sean Connery never sent a typewritten letter to late Apple Co-founder Steve Jobs in 1998 refusing to be in an Apple ad, and a fake such letter made the rounds on social media after his death. The typewritten letter purports to show Connery’s outrage over Jobs asking him to appear",
+          "bm25_score": 53.198348659693394,
+          "rerank_score": 9.33358097076416
+        },
+        {
+          "text": "the world' as you suggest. You have nothing I need or want. You're a computer salesman - and I'm a f*cking JAMES BOND! I can't think of a quicker way to ruin my career than to appear in one of your awful commercials. Best regards, Sean Connery.\" It quickly became clear that the letter was written by the creators of a satirical website about Applu called Scoopertino. Sean Connery did not actually send Steve Jobs a typewritten letter in 1998 refusing to appear in the company's commercial. Apple. The fake letter was part of a satirical article on the website,",
+          "bm25_score": 56.07282664904696,
+          "rerank_score": 8.820548057556152
+        },
+        {
+          "text": "was created by the satirical Apple-focused site, Scoopertino. First, the bad news. Sean Connery never actually sent a typewritten letter to Steve Jobs in 1998 refusing to be in an Apple ad. But the awesome news is that quite a few people believe Connery owns personalized stationery with a “007” vanity stamp in the corner and that he would have no qualms using it to dash off a letter dressing down Jobs by declaring “…you are a computer salesman. I am f%$^ing JAMES BOND!” The letter was actually part of a satirical article on the previously little known (and very",
+          "bm25_score": 52.12532325774563,
+          "rerank_score": 8.804670333862305
+        },
+        {
+          "text": "Sean Connery did not insult Steve Jobs by calling him salesman, viral letter is fake There is a viral letter going around on social media claiming that Sean Connery once insulted Steve Jobs saying \"You are a computer salesman, I am fucking JAMES BOND\" and refused to do an Apple ad. But did it really happen? In the wake of actor Sean Connery’s death, a fake letter, purportedly from him to Apple co-founder Steve Jobs, is going viral on social media. Sean, the original James Bond of Hollywood, was known for never mincing his words. In 2005, when he took",
+          "bm25_score": 58.75665343148913,
+          "rerank_score": 8.313972473144531
+        }
+      ],
+      "stances": [
+        {
+          "text": "'I am f****** James Bond': Sean Connery letter to Steve Jobs rejecting offer to appear in Apple ad revealed to be fake Thousands of James Bond fans were today taken in by a spoof letter from Sean Conney to Apple boss Steve Jobs in which the film star launches a rant at the computer chief. The faked A4 letter on 007 paper was published online claiming to have been a response from Connery to a request to feature in an advert for Apple. It purportedly shows Connery aggressively declining the offer and telling Jobs 'You are a computer salesman -",
+          "label": "not enough evidence",
+          "bm25_score": 57.37180952076094,
+          "rerank_score": 9.3362455368042
+        },
+        {
+          "text": "No, Sean Connery Never Wrote a Rude letter to Apple's Steve Jobs Sir Sean Connery never sent a typewritten letter to late Apple Co-founder Steve Jobs in 1998 refusing to be in an Apple ad, and a fake such letter made the rounds on social media after his death. Sir Sean Connery never sent a typewritten letter to late Apple Co-founder Steve Jobs in 1998 refusing to be in an Apple ad, and a fake such letter made the rounds on social media after his death. The typewritten letter purports to show Connery’s outrage over Jobs asking him to appear",
+          "label": "not enough evidence",
+          "bm25_score": 53.198348659693394,
+          "rerank_score": 9.33358097076416
+        },
+        {
+          "text": "the world' as you suggest. You have nothing I need or want. You're a computer salesman - and I'm a f*cking JAMES BOND! I can't think of a quicker way to ruin my career than to appear in one of your awful commercials. Best regards, Sean Connery.\" It quickly became clear that the letter was written by the creators of a satirical website about Applu called Scoopertino. Sean Connery did not actually send Steve Jobs a typewritten letter in 1998 refusing to appear in the company's commercial. Apple. The fake letter was part of a satirical article on the website,",
+          "label": "not enough evidence",
+          "bm25_score": 56.07282664904696,
+          "rerank_score": 8.820548057556152
+        },
+        {
+          "text": "was created by the satirical Apple-focused site, Scoopertino. First, the bad news. Sean Connery never actually sent a typewritten letter to Steve Jobs in 1998 refusing to be in an Apple ad. But the awesome news is that quite a few people believe Connery owns personalized stationery with a “007” vanity stamp in the corner and that he would have no qualms using it to dash off a letter dressing down Jobs by declaring “…you are a computer salesman. I am f%$^ing JAMES BOND!” The letter was actually part of a satirical article on the previously little known (and very",
+          "label": "not enough evidence",
+          "bm25_score": 52.12532325774563,
+          "rerank_score": 8.804670333862305
+        },
+        {
+          "text": "Sean Connery did not insult Steve Jobs by calling him salesman, viral letter is fake There is a viral letter going around on social media claiming that Sean Connery once insulted Steve Jobs saying \"You are a computer salesman, I am fucking JAMES BOND\" and refused to do an Apple ad. But did it really happen? In the wake of actor Sean Connery’s death, a fake letter, purportedly from him to Apple co-founder Steve Jobs, is going viral on social media. Sean, the original James Bond of Hollywood, was known for never mincing his words. In 2005, when he took",
+          "label": "not enough evidence",
+          "bm25_score": 58.75665343148913,
+          "rerank_score": 8.313972473144531
+        }
+      ]
+    }
+  }
+]

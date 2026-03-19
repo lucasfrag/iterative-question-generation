@@ -1,4 +1,4 @@
-import os
+from config import Config
 
 from pipeline.pipeline import Pipeline
 from modules.llm.ollama_interface import OllamaLLM
@@ -13,13 +13,11 @@ from modules.qa.qa_generator import QAGenerator
 from modules.verdict.rule_verdict import RuleVerdict
 from modules.justification.justification_generator import JustificationGenerator
 
-from dotenv import load_dotenv
 
 def pipeline_rule_verdict():
-    load_dotenv()
 
-    llm = OllamaLLM()
-    searcher = WebSearch(api_key=os.getenv("BRAVE_API_KEY"))
+    llm = OllamaLLM(Config.OLLAMA_MODEL)
+    searcher = WebSearch(api_key=Config.BRAVE_API_KEY)
 
     pipeline = Pipeline(
         question_generator=QuestionGenerator(llm),
@@ -31,16 +29,18 @@ def pipeline_rule_verdict():
         qa_generator=QAGenerator(llm),
         verdict_predictor=RuleVerdict(),
         justification_generator=JustificationGenerator(llm),
+
+        # 👇 pode deixar sempre aqui — o controle é no Pipeline.run()
         reranker=CrossEncoderReranker()
     )
 
     return pipeline
 
-def pipeline_majority_verdict():
-    load_dotenv()
 
-    llm = OllamaLLM()
-    searcher = WebSearch(api_key=os.getenv("BRAVE_API_KEY"))
+def pipeline_majority_verdict():
+
+    llm = OllamaLLM(Config.OLLAMA_MODEL)
+    searcher = WebSearch(api_key=Config.BRAVE_API_KEY)
 
     pipeline = Pipeline(
         question_generator=QuestionGenerator(llm),
@@ -50,7 +50,7 @@ def pipeline_majority_verdict():
         retriever=BM25Retriever(),
         stance_detector=LLMStanceDetector(llm),
         qa_generator=QAGenerator(llm),
-        verdict_predictor=RuleVerdict(),
+        verdict_predictor=RuleVerdict(),  # depois tu troca se quiser
         justification_generator=JustificationGenerator(llm),
         reranker=CrossEncoderReranker()
     )

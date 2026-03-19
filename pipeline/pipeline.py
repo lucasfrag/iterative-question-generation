@@ -1,3 +1,6 @@
+from config import Config
+
+
 class Pipeline:
 
     def __init__(self,
@@ -31,9 +34,13 @@ class Pipeline:
         context = self.parser.run(context)
         context = self.segmenter.run(context)
         context = self.retriever.run(context)
-        context = self.reranker.run(context)
+
+        if Config.USE_RERANKER:
+            context = self.reranker.run(context)
+
         context = self.qa_generator.run(context)
         context = self.stance_detector.run(context)
         context = self.verdict_predictor.run(context)
         context = self.justification_generator.run(context)
+
         return context

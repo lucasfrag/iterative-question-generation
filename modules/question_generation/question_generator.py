@@ -1,3 +1,5 @@
+from config import Config
+
 class QuestionGenerator:
 
     def __init__(self, llm):
@@ -7,11 +9,22 @@ class QuestionGenerator:
     def run(self, context):
 
         prompt = f"""
-        Generate exactly 3 short verification questions for the claim.
+        Task: Generate questions to verify a claim.
 
-        Return ONLY the questions, one per line.
+        Claim:
+        {context.claim}
 
-        Claim: {context.claim}
+        Claim date:
+        {context.claim_date}
+
+        Instructions:
+        - Generate specific, factual questions
+        - Focus on verifiable facts (who, what, when, where)
+        - Avoid vague or redundant questions
+        - Consider the time context of the claim
+
+        Output:
+        Provide a list of max {Config.MAX_QUESTIONS} questions.
         """
 
         output = self.llm.generate(prompt)
@@ -26,6 +39,6 @@ class QuestionGenerator:
                 continue
             questions.append(line)
 
-        context.questions = questions[:3]
+        context.questions = questions[:Config.MAX_QUESTIONS]
 
         return context

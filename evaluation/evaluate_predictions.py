@@ -28,8 +28,8 @@ def evaluate(predictions_path, dataset_path):
 
 
     gold = {
-        i: normalize(item["label"])
-        for i, item in enumerate(dataset)
+        item["claim"]: normalize(item["label"])
+        for item in dataset
     }
 
 
@@ -38,14 +38,13 @@ def evaluate(predictions_path, dataset_path):
 
 
     for pred in predictions:
+        claim = pred["claim"]
 
-        claim_id = pred["id"]
-
-        if claim_id not in gold:
+        if claim not in gold:
             continue
 
-        y_true.append(gold[claim_id])
-        y_pred.append(normalize(pred["predicted_label"]))
+        y_true.append(gold[claim])
+        y_pred.append(normalize(pred["prediction"]))
 
 
     results = compute_metrics(y_true, y_pred)

@@ -6,26 +6,35 @@ class JustificationGenerator:
 
     def run(self, context):
 
-        evidence_text = "\n\n".join(context.evidence[:5])
+        evidence_text = "\n\n".join(
+            e["text"] if isinstance(e, dict) else e
+            for e in context.evidence[:5]
+        )
 
         prompt = f"""
-        You are a fact-checking assistant.
+        Task: Write a justification for the verdict.
 
         Claim:
         {context.claim}
 
-        Evidence:
-        {evidence_text}
+        Claim date:
+        {context.claim_date}
 
         Verdict:
         {context.verdict}
 
-        Explain briefly how the evidence relates to the claim.
+        Evidence:
+        {evidence_text}
 
-        Do not judge people or accuse anyone of wrongdoing.
-        Simply summarize the relationship between the evidence and the claim.
+        Instructions:
+        - Explain why the verdict is correct
+        - Use only the provided evidence
+        - Be concise (2–3 sentences)
+        - Be neutral and factual
+        - Do not add new information
 
-        Write 2–3 neutral sentences.
+        Output:
+        Write a short justification.
         """
 
         justification = self.llm.generate(prompt).strip()
