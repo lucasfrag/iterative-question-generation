@@ -10,13 +10,14 @@ class Config:
     LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0.0))
     LANGUAGE = os.getenv("LANGUAGE", "en")
 
-    # Search Engine API Keys
+    # Search
     SEARCH_ENGINE = os.getenv("SEARCH_ENGINE", "brave")
+    SEARCH_MAX_RESULTS = int(os.getenv("SEARCH_MAX_RESULTS", 10))
+    SEARCH_MAX_URLS = int(os.getenv("SEARCH_MAX_URLS", 50))
 
+    # Search Engine API Keys
     BRAVE_API_KEY = os.getenv("BRAVE_API_KEY")
-
     SERPAPI_KEY = os.getenv("SERPAPI_KEY")
-
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID")
 
