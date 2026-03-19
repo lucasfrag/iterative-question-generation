@@ -19,10 +19,10 @@ class LLMStanceDetector:
 
         Labels:
 
-        SUPPORT:
+        SUPPORTED:
         The evidence clearly confirms the claim.
 
-        REFUTE:
+        REFUTED:
         The evidence clearly contradicts the claim OR explicitly states that it is false, fake, a hoax, or did not happen.
 
         NOT ENOUGH EVIDENCE:
@@ -32,8 +32,8 @@ class LLMStanceDetector:
         The evidence contains both supporting and contradicting information.
 
         Decision rules:
-        - If the evidence says "fake", "false", "hoax", or "did not happen" → REFUTE
-        - If the evidence denies the claim → REFUTE
+        - If the evidence says "fake", "false", "hoax", or "did not happen" → REFUTED
+        - If the evidence denies the claim → REFUTED
         - Only choose NOT ENOUGH EVIDENCE if there is truly no clear conclusion
         - Do NOT be overly cautious
 
@@ -43,10 +43,10 @@ class LLMStanceDetector:
 
         response = self.llm.generate(prompt).strip().upper()
 
-        if "SUPPORT" in response:
-            return "SUPPORT"
-        elif "REFUTE" in response:
-            return "REFUTE"
+        if "SUPPORTED" in response:
+            return "SUPPORTED"
+        elif "REFUTED" in response:
+            return "REFUTED"
         elif "CONFLICTING" in response:
             return "CONFLICTING EVIDENCE/CHERRYPICKING"
         elif "NOT ENOUGH" in response:

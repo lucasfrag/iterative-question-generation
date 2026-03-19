@@ -20,9 +20,9 @@ class RuleVerdict(BaseVerdict):
 
             # 🔧 normalização
             if label in ["SUPPORT", "SUPPORTED"]:
-                label = "SUPPORT"
+                label = "SUPPORTED"
             elif label in ["REFUTE", "REFUTED"]:
-                label = "REFUTE"
+                label = "REFUTED"
             elif "NOT ENOUGH" in label:
                 label = "NOT ENOUGH EVIDENCE"
             elif "CONFLICTING" in label:
@@ -36,15 +36,15 @@ class RuleVerdict(BaseVerdict):
 
         counts = Counter(stances)
 
-        support = counts.get("SUPPORT", 0)
-        refute = counts.get("REFUTE", 0)
+        support = counts.get("SUPPORTED", 0)
+        refute = counts.get("REFUTED", 0)
         nee = counts.get("NOT ENOUGH EVIDENCE", 0)
 
         if support > refute and support > nee:
-            verdict = "SUPPORT"
+            verdict = "SUPPORTED"
 
         elif refute > support and refute > nee:
-            verdict = "REFUTE"
+            verdict = "REFUTED"
 
         elif support == 0 and refute == 0:
             verdict = "NOT ENOUGH EVIDENCE"

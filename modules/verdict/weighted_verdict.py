@@ -14,9 +14,9 @@ class WeightedVerdict(BaseVerdict):
 
             # 🔧 normalização
             if label in ["SUPPORT", "SUPPORTED"]:
-                label = "SUPPORT"
+                label = "SUPPORTED"
             elif label in ["REFUTE", "REFUTED"]:
-                label = "REFUTE"
+                label = "REFUTED"
             elif "NOT ENOUGH" in label:
                 label = "NOT ENOUGH EVIDENCE"
             elif "CONFLICTING" in label:
