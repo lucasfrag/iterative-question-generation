@@ -21,7 +21,7 @@ from result_writer import ResultWriter
 # 🔧 CONFIG
 VERBOSE = True
 PRINT_EVERY = 1
-SAVE_EVERY = 10
+SAVE_EVERY = 2
 
 
 # =========================
