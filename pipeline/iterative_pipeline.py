@@ -1,7 +1,7 @@
 from config import Config
 
 
-class Pipeline:
+class IterativePipeline:
 
     def __init__(self,
                  question_generator,

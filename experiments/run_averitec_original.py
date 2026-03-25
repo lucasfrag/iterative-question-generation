@@ -11,7 +11,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from pipeline.pipeline_factory import averitec_pipeline
+from pipeline.pipeline_factory import averitec_original_pipeline
 from pipeline.context import ClaimContext
 from experiment_config import ExperimentConfig
 from checkpoint import CheckpointManager
@@ -33,7 +33,7 @@ def load_dataset(path):
         return json.load(f)
 
 
-def get_latest_run(base_dir="outputs"):
+def get_latest_run(base_dir="outputs/averitec_original_pipeline"):
     if not os.path.exists(base_dir):
         return None
 
@@ -118,7 +118,7 @@ def run():
             run_dir = get_latest_run()
 
             if run_dir is None:
-                raise ValueError("No previous runs found in outputs/")
+                raise ValueError("No previous runs found in outputs/averitec_original_pipeline/")
 
             print(f"\n♻️ Resuming latest run: {run_dir}")
         else:
@@ -126,7 +126,7 @@ def run():
             print(f"\n♻️ Resuming run: {run_dir}")
     else:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        run_dir = os.path.join("outputs", timestamp)
+        run_dir = os.path.join("outputs/averitec_original_pipeline", timestamp)
         os.makedirs(run_dir, exist_ok=True)
         print(f"\n📁 New run directory: {run_dir}")
 
@@ -134,7 +134,7 @@ def run():
     # Pipeline
     # =========================
 
-    pipeline = averitec_pipeline()
+    pipeline = averitec_original_pipeline()
 
     # =========================
     # Save config (only if new run)

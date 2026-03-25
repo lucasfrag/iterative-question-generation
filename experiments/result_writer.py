@@ -74,9 +74,11 @@ class ResultWriter:
         else:
             existing_data = []
 
-        # 🔥 concatena
-        all_results = self.results
+        all_results = existing_data + self.results
 
         # 🔥 salva tudo
         with open(path, "w", encoding="utf-8") as f:
             json.dump(all_results, f, indent=2, ensure_ascii=False)
+
+        # 🔥 limpa buffer pra evitar duplicação futura
+        self.results = []

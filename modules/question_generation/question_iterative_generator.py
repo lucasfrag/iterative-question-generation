@@ -1,7 +1,7 @@
 from config import Config
 
 
-class QuestionGenerator:
+class QuestionIterativeGenerator:
 
     def __init__(self, llm):
         self.llm = llm
@@ -57,15 +57,13 @@ Instructions:
 - Generate ONLY ONE question
 - Do NOT repeat previous questions
 - Focus on missing or uncertain aspects
-- Prefer specific, verifiable facts
+- Do not force unnecessary questions
+- Avoid redundancy
+- Questions must be factual and verifiable
 - If claim involves time, check chronology
 - If claim involves attribution, verify speaker/source
 - If claim involves numbers, verify quantities
 
-CRITICAL:
-- Include key entities from the claim (names, organizations)
-- Avoid generic terms like "evidence" without context
-- Questions must stay semantically close to the claim
 
 Output:
 Provide only the question.
