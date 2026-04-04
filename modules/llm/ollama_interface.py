@@ -1,11 +1,13 @@
+import os
+
 from config import Config
 import ollama
 
 
 class OllamaLLM:
 
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, model=None):
+        self.model = model or os.getenv("OLLAMA_MODEL")
         self.system_prompt = self._build_system_prompt()
 
     def _build_system_prompt(self):
