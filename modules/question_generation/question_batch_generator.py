@@ -35,6 +35,7 @@ class QuestionBatchGenerator:
         - If claim involves time, check chronology
         - If claim involves attribution, verify speaker/source
         - If claim involves numbers, verify quantities
+        - Do not provide explanations
 
         Output:
         Return a numbered list of questions only.

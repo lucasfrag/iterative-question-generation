@@ -25,11 +25,12 @@ class DuckDuckGoSearch:
     def run(self, context):
 
         # 🔥 MELHORIA 1: reduzir queries
-        queries = [context.claim]
+        # queries = [context.claim]
 
         # opcional: usar só top 2 perguntas
         questions = getattr(context, "questions", [])
-        queries.extend(questions[:2])
+        # queries.extend(questions[:2])
+        queries = questions
 
         urls = []
 
@@ -59,5 +60,5 @@ class DuckDuckGoSearch:
                 unique_urls.append(url)
 
         context.search_results = unique_urls[:self.max_urls]
-
+        context.num_queries = len(queries)
         return context

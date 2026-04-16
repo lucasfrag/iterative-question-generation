@@ -1,7 +1,9 @@
 import os
+import ollama
 
 from config import Config
-import ollama
+from utils.metrics import metrics
+from utils.token_counter import TokenCounter
 
 
 class OllamaLLM:
@@ -9,6 +11,9 @@ class OllamaLLM:
     def __init__(self, model=None):
         self.model = model or os.getenv("OLLAMA_MODEL")
         self.system_prompt = self._build_system_prompt()
+
+        # ✅ FIX AQUI (sem argumento)
+        self.token_counter = TokenCounter()
 
     def _build_system_prompt(self):
 
@@ -30,6 +35,17 @@ General rules:
 
     def generate(self, prompt):
 
+        # 🔢 tokens de entrada (aproximação consistente)
+        prompt_tokens = self.token_counter.count_chat(
+            self.system_prompt,
+            prompt
+        )
+
+        # 🔥 DEBUG (remover depois)
+        #print(f"🔥 LLM CALL #{metrics.num_llm_calls + 1}")
+        #print(f"   Prompt tokens: {prompt_tokens}")
+#
+        # 🚀 chamada ao modelo
         response = ollama.chat(
             model=self.model,
             messages=[
@@ -38,4 +54,14 @@ General rules:
             ]
         )
 
-        return response["message"]["content"]
+        output = response["message"]["content"]
+
+        # 🔢 tokens de saída
+        completion_tokens = self.token_counter.count(output)
+
+        #print(f"   Completion tokens: {completion_tokens}\n")
+
+        # 🔥 log global
+        metrics.log_llm(prompt_tokens, completion_tokens)
+
+        return output

@@ -16,7 +16,7 @@ from pipeline.context import ClaimContext
 from experiment_config import ExperimentConfig
 from checkpoint import CheckpointManager
 from result_writer import ResultWriter
-
+from utils.logger import SimpleLogger
 
 # 🔧 CONFIG
 VERBOSE = True
@@ -106,12 +106,11 @@ def load_done_ids(path):
 def run():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--resume", type=str, default=None,
-                        help="Nome do modelo para resumir (ex: gemma3-4b)")
+    parser.add_argument("--resume", type=str, default=None)
     args = parser.parse_args()
 
     # =========================
-    # Run directory (MODEL-BASED)
+    # Run directory
     # =========================
 
     if args.resume:
@@ -124,6 +123,10 @@ def run():
     os.makedirs(run_dir, exist_ok=True)
 
     print(f"\n📁 Run directory: {run_dir}")
+
+    # LOGGER
+    log_path = os.path.join(run_dir, "metrics.jsonl")
+    logger = SimpleLogger(log_path)
 
     pipeline = averitec_iterative_pipeline()
 
@@ -154,15 +157,12 @@ def run():
         print(f"\n🚀 Running dataset: {name}")
 
         data = load_dataset(path)
-
         output_path = os.path.join(run_dir, f"{name}.jsonl")
 
         writer = ResultWriter(output_path)
-
         done_ids = load_done_ids(output_path)
 
         total = len(data)
-
         pbar = tqdm(total=total, desc=name)
         pbar.update(len(done_ids))
 
@@ -183,30 +183,137 @@ def run():
                 speaker=item.get("speaker")
             )
 
+            # =========================
+            # RESET METRICS + LATENCY
+            # =========================
+            from utils.metrics import metrics
+            import time
+
+            metrics.reset()
+            start_time = time.time()
+
+            # =========================
+            # RUN PIPELINE
+            # =========================
             result = pipeline.run(context)
 
-            # debug
-            if VERBOSE and i % PRINT_EVERY == 0:
+            latency = time.time() - start_time
 
-                steps = getattr(result, "steps", [])
+            # =========================
+            # 🔥 EXTRAÇÃO CORRETA (FINAL)
+            # =========================
+
+            qa_pairs = getattr(result, "qa_pairs", []) or []
+            evidences = getattr(result, "evidence", []) or []
+
+            if not isinstance(evidences, list):
+                evidences = [evidences]
+
+            steps = []
+
+            for qa in qa_pairs:
+
+                processed_evidence = []
+
+                for ev in evidences:
+                    if isinstance(ev, dict):
+                        processed_evidence.append({
+                            "text": ev.get("text"),
+                            "url": ev.get("url"),
+                            "rerank_score": ev.get("rerank_score"),
+                        })
+
+                steps.append({
+                    "question": qa.get("question"),
+                    "answer": qa.get("answer"),
+                    "evidence": processed_evidence
+                })
+
+            num_queries = getattr(result, "num_queries", 0)
+
+            # =========================
+            # RERANK SCORE
+            # =========================
+
+            rerank_scores = []
+
+            for step in steps:
+                for ev in step.get("evidence", []):
+                    if ev.get("rerank_score") is not None:
+                        rerank_scores.append(ev["rerank_score"])
+
+            avg_rerank = (
+                sum(rerank_scores) / len(rerank_scores)
+                if rerank_scores else None
+            )
+
+            questions = [s["question"] for s in steps if s.get("question")]
+
+            # =========================
+            # PERFORMANCE
+            # =========================
+
+            gt = item.get("label")
+            pred = result.verdict
+            correct = str(pred).lower() == str(gt).lower()
+
+            # =========================
+            # 🔥 LOG FINAL
+            # =========================
+
+            logger.log({
+                "claim_id": i,
+                "model": model_name,
+                "method": "iterative",
+
+                # retrieval
+                "num_queries": num_queries,
+                "avg_rerank": avg_rerank,
+
+                # LLM cost
+                "num_llm_calls": metrics.num_llm_calls,
+                "prompt_tokens": metrics.total_prompt_tokens,
+                "completion_tokens": metrics.total_completion_tokens,
+                "total_tokens": (
+                    metrics.total_prompt_tokens +
+                    metrics.total_completion_tokens
+                ),
+
+                # performance
+                "prediction": pred,
+                "gold_label": gt,
+                "correct": correct,
+
+                # system
+                "latency": latency,
+
+                # qualitativo
+                "questions": questions
+            })
+
+            # =========================
+            # DEBUG
+            # =========================
+
+            if VERBOSE and i % PRINT_EVERY == 0:
 
                 for j, step in enumerate(steps):
                     print_step_debug(step, j)
 
-                gt = item.get("label")
-                correct = (str(result.verdict).lower() == str(gt).lower())
-
                 print("\n   " + ("✅ CORRECT" if correct else "❌ WRONG"))
-                print(f"   PRED: {result.verdict}")
+                print(f"   PRED: {pred}")
                 print(f"   GT  : {gt}")
 
-            # 🔥 salva imediatamente
+            # =========================
+            # SAVE ORIGINAL RESULT
+            # =========================
+
             writer.append(item, result, claim_id=i)
 
             pbar.update(1)
 
         pbar.close()
 
-
+        
 if __name__ == "__main__":
     run()

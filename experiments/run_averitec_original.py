@@ -5,6 +5,7 @@ import argparse
 import subprocess
 from datetime import datetime
 from tqdm import tqdm
+import time
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -14,14 +15,16 @@ if project_root not in sys.path:
 from pipeline.pipeline_factory import averitec_original_pipeline
 from pipeline.context import ClaimContext
 from experiment_config import ExperimentConfig
-from checkpoint import CheckpointManager
 from result_writer import ResultWriter
+
+# 🔥 NOVO
+from utils.logger import SimpleLogger
+from utils.metrics import metrics
 
 
 # 🔧 CONFIG
 VERBOSE = True
 PRINT_EVERY = 1
-SAVE_EVERY = 1
 
 
 # =========================
@@ -55,7 +58,6 @@ def load_env_filtered():
         "USE_RERANKER",
         "CHUNK_SIZE",
     ]
-
     return {k: os.getenv(k) for k in allowed_keys}
 
 
@@ -73,13 +75,9 @@ def print_step_debug(step, step_id):
     print(f"   Q: {step.get('question')}")
     print(f"   A: {step.get('answer')[:200]}...")
 
-    if step.get("stance"):
-        print(f"   Stance: {step.get('stance')}")
-
     if step.get("evidence"):
-        top_ev = step["evidence"][0] if isinstance(step["evidence"], list) else step["evidence"]
-        text = top_ev.get("text") if isinstance(top_ev, dict) else str(top_ev)
-        print(f"   Evidence (top): {text[:200]}...")
+        ev = step["evidence"][0]
+        print(f"   Evidence: {ev.get('text')[:200]}...")
 
 
 def load_done_ids(path):
@@ -106,17 +104,15 @@ def load_done_ids(path):
 def run():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--resume", type=str, default=None,
-                        help="Nome do modelo para resumir (ex: gemma3-4b)")
+    parser.add_argument("--resume", type=str, default=None)
     args = parser.parse_args()
 
     # =========================
-    # Run directory (MODEL-BASED)
+    # Run directory
     # =========================
 
     if args.resume:
         model_name = args.resume
-        print(f"\n♻️ Resuming model: {model_name}")
     else:
         model_name = get_model_name()
 
@@ -124,6 +120,10 @@ def run():
     os.makedirs(run_dir, exist_ok=True)
 
     print(f"\n📁 Run directory: {run_dir}")
+
+    # 🔥 LOGGER
+    log_path = os.path.join(run_dir, "metrics.jsonl")
+    logger = SimpleLogger(log_path)
 
     pipeline = averitec_original_pipeline()
 
@@ -156,14 +156,11 @@ def run():
         data = load_dataset(path)
 
         output_path = os.path.join(run_dir, f"{name}.jsonl")
-
         writer = ResultWriter(output_path)
 
         done_ids = load_done_ids(output_path)
 
-        total = len(data)
-
-        pbar = tqdm(total=total, desc=name)
+        pbar = tqdm(total=len(data), desc=name)
         pbar.update(len(done_ids))
 
         for i, item in enumerate(data):
@@ -183,24 +180,125 @@ def run():
                 speaker=item.get("speaker")
             )
 
+            # =========================
+            # 🔥 RESET + LATENCY
+            # =========================
+            metrics.reset()
+            start_time = time.time()
+
             result = pipeline.run(context)
 
-            # debug
-            if VERBOSE and i % PRINT_EVERY == 0:
+            latency = time.time() - start_time
 
-                steps = getattr(result, "steps", [])
+            # =========================
+            # 🔥 EXTRAÇÃO (IGUAL ITERATIVE)
+            # =========================
+
+            qa_pairs = getattr(result, "qa_pairs", []) or []
+            evidences = getattr(result, "evidence", []) or []
+
+            if not isinstance(evidences, list):
+                evidences = [evidences]
+
+            steps = []
+
+            for qa in qa_pairs:
+
+                processed_evidence = []
+
+                for ev in evidences:
+                    if isinstance(ev, dict):
+                        processed_evidence.append({
+                            "text": ev.get("text"),
+                            "url": ev.get("url"),
+                            "rerank_score": ev.get("rerank_score"),
+                        })
+
+                steps.append({
+                    "question": qa.get("question"),
+                    "answer": qa.get("answer"),
+                    "evidence": processed_evidence
+                })
+
+            # =========================
+            # 🔥 RERANK SCORE
+            # =========================
+
+            rerank_scores = []
+
+            for step in steps:
+                for ev in step.get("evidence", []):
+                    if ev.get("rerank_score") is not None:
+                        rerank_scores.append(ev["rerank_score"])
+
+            avg_rerank = (
+                sum(rerank_scores) / len(rerank_scores)
+                if rerank_scores else None
+            )
+
+            questions = [s["question"] for s in steps if s.get("question")]
+
+            num_queries = getattr(result, "num_queries", 0)
+
+            # =========================
+            # 🔥 PERFORMANCE
+            # =========================
+
+            gt = item.get("label")
+            pred = result.verdict
+            correct = str(pred).lower() == str(gt).lower()
+
+            # =========================
+            # 🔥 LOG FINAL (IGUAL ITERATIVE)
+            # =========================
+
+            logger.log({
+                "claim_id": i,
+                "model": model_name,
+                "method": "original",
+
+                # retrieval
+                "num_queries": num_queries,
+                "avg_rerank": avg_rerank,
+
+                # LLM cost
+                "num_llm_calls": metrics.num_llm_calls,
+                "prompt_tokens": metrics.total_prompt_tokens,
+                "completion_tokens": metrics.total_completion_tokens,
+                "total_tokens": (
+                    metrics.total_prompt_tokens +
+                    metrics.total_completion_tokens
+                ),
+
+                # performance
+                "prediction": pred,
+                "gold_label": gt,
+                "correct": correct,
+
+                # system
+                "latency": latency,
+
+                # qualitativo
+                "questions": questions
+            })
+
+            # =========================
+            # DEBUG
+            # =========================
+
+            if VERBOSE and i % PRINT_EVERY == 0:
 
                 for j, step in enumerate(steps):
                     print_step_debug(step, j)
 
-                gt = item.get("label")
-                correct = (str(result.verdict).lower() == str(gt).lower())
-
                 print("\n   " + ("✅ CORRECT" if correct else "❌ WRONG"))
-                print(f"   PRED: {result.verdict}")
+                print(f"   PRED: {pred}")
                 print(f"   GT  : {gt}")
 
-            # 🔥 salva imediatamente
+            # =========================
+            # SAVE RESULT
+            # =========================
+
             writer.append(item, result, claim_id=i)
 
             pbar.update(1)

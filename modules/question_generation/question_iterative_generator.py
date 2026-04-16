@@ -63,7 +63,7 @@ Instructions:
 - If claim involves time, check chronology
 - If claim involves attribution, verify speaker/source
 - If claim involves numbers, verify quantities
-
+- Do not provide explanations
 
 Output:
 Provide only the question.
