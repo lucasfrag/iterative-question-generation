@@ -178,38 +178,6 @@ Labels:
 
 ---
 
-## ⚠️ Reproducibility Notes
-
-Some variability is expected due to:
-
-- Live web search (non-deterministic results)
-- Changes in web content over time
-- Model/tokenizer differences
-
-💡 Recommendations:
-- Use caching (`CACHE_DIR`)
-- Fix model versions when possible
-
----
-
-## 🧠 Important Notes
-
-- All components are kept fixed except **question generation**
-- This isolates the effect of iterative reasoning
-- The stopping condition is model-driven
-
----
-
-## 🛠️ Customization
-
-You can easily:
-
-- Change models via `.env`
-- Adjust query budget
-- Replace search engine
-- Modify prompts in `src/prompts/`
-
----
 <!--
 ## 📚 Citation
 
