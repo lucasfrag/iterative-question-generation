@@ -158,8 +158,7 @@ Includes:
   - Reduces abstention (NEI)
   - Increases token usage (7–17%)
 
-👉 Key insight:  
-**Iterative generation shifts computation from retrieval to reasoning**
+👉 Key insight: **Iterative generation shifts computation from retrieval to reasoning**
 
 ---
 
