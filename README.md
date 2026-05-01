@@ -52,10 +52,10 @@ The key contribution is a controlled comparison between:
 
 ### 1. Clone the repository
 
-```bash
+<!--```bash
 git clone https://github.com/lucasfrag/iterative-question-generation.git
 cd iterative-question-generation/
-```
+```-->
 
 ---
 
