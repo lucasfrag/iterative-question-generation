@@ -37,12 +37,89 @@ The key contribution is a controlled comparison between:
 - No access to intermediate evidence
 - All queries are independent
 
+```
+prompt = f"""
+You are a fact-checking assistant.
+
+Task: Generate up to {num_questions} questions to verify the claim.
+
+Claim:
+{context.claim}
+
+Claim date:
+{context.claim_date}
+
+Speaker:
+{context.speaker}
+
+Instructions:
+- Generate as many useful questions as needed (from 1 up to {num_questions})
+- Do not force unnecessary questions
+- Avoid redundancy
+- Questions must be factual and verifiable
+- If claim involves time, check chronology
+- If claim involves attribution, verify speaker/source
+- If claim involves numbers, verify quantities
+- Do not provide explanations
+
+Output:
+Return a numbered list of questions only.
+"""
+```
+
 ### 🔹 Iterative
 - Generates **one question at a time**
 - Each question is conditioned on:
   - previously generated questions
   - previously retrieved evidence
 - Stops early if enough evidence is gathered
+
+```
+prompt = f"""
+Task: Generate ONE new question to help verify the claim.
+
+Claim:
+{context.claim}
+
+Claim date:
+{context.claim_date}
+
+Speaker:
+{context.speaker}
+
+---
+
+Previous questions:
+{previous_questions}
+
+---
+
+Known evidence (partial):
+{evidence_snippets}
+
+---
+
+Current stance signals:
+{stance_summary}
+
+---
+
+Instructions:
+- Generate ONLY ONE question
+- Do NOT repeat previous questions
+- Focus on missing or uncertain aspects
+- Do not force unnecessary questions
+- Avoid redundancy
+- Questions must be factual and verifiable
+- If claim involves time, check chronology
+- If claim involves attribution, verify speaker/source
+- If claim involves numbers, verify quantities
+- Do not provide explanations
+
+Output:
+Provide only the question.
+"""
+```
 
 👉 The only difference between methods is **how questions are generated**
 
@@ -52,10 +129,10 @@ The key contribution is a controlled comparison between:
 
 ### 1. Clone the repository
 
-<!--```bash
+```bash
 git clone https://github.com/lucasfrag/iterative-question-generation.git
 cd iterative-question-generation/
-```-->
+```
 
 ---
 
